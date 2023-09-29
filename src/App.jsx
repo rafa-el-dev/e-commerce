@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { commerce } from "./lib/commerce";
-import { NavBar, Products } from "./components";
+import { NavBar, Products, Cart } from "./components";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -11,7 +12,7 @@ const App = () => {
       const productData = await commerce.products.list();
       setProducts(productData.data);
     } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
+      console.error("Error fetching products:", error);
     }
   };
 
@@ -20,7 +21,7 @@ const App = () => {
       const cartData = await commerce.cart.retrieve();
       setCart(cartData);
     } catch (error) {
-      console.error("Erro ao buscar carrinho:", error);
+      console.error("Error fetching cart:", error);
     }
   };
 
@@ -29,7 +30,7 @@ const App = () => {
       const item = await commerce.cart.add(productId, quantity);
       setCart(item);
     } catch (error) {
-      console.error("Erro ao adicionar item ao carrinho:", error);
+      console.error("Error adding item to cart:", error);
     }
   };
 
@@ -39,10 +40,15 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <NavBar totalItems={cart.total_items} />
-      <Products products={products} onAddToCart={handleAddToCart} />
-    </div>
+    <Router>
+      <div>
+        <NavBar totalItems={cart.total_items} />
+        <Routes>
+          <Route path="/" element={ <Products products={products} onAddToCart={handleAddToCart} /> } />
+          <Route path="/cart" element={<Cart cart={cart} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 
